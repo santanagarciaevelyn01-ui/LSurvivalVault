@@ -4,83 +4,92 @@
 
 
 
-### La Solución Definitiva de Almacenamiento Virtual para Servidores de Alto Rendimiento.
+## 📖 Introducción
 
-**LSurvival Vault** no es otro plugin de `/vault` más. Es una reingeniería total del concepto de almacenamiento personal, diseñado específicamente para servidores **Survival, PvP y Hardcore** que no pueden permitirse fallos, lag ni dupeos.
+**LSurvival Vault**  en la gestión de inventarios virtuales. Diseñado desde cero para servidores **Survival Hardcore, PvP y RPG**
 
- Este sistema es **100% Virtual, Seguro y Escalable**.
+A diferencia de mis ideas Anteriores que "esconden" barricadas físicas debajo del mapa (causando lag, desync y glitches de duplicación), **LSurvival Vault** utiliza tecnología de **Inyección de Memoria (Mock Storage)**.
 
------
+### ¿Por qué elegir LSurvival Vault?
 
-## 🔥 Características Principales
+| Característica | Plugins Tradicionales (Legacy) | ⚡ LSurvival Vault (Next-Gen) |
+| :--- | :--- | :--- |
+| **Tecnología** |  | **Virtual Mock Storage (RAM Injection)** |
+| **Impacto FPS** |  **Nulo (0.00ms)** |
+| **Riesgo de Dupeo**  **Imposible (Transacciones Atómicas)** |
+| **Persistencia** | **Base de Datos LiteDB (NoSQL)** |
+| **Escalabilidad** |  **Infinita (1 a 18+ Baúles Config)** |
 
-  * 🚀 **Tecnología "Zero-Lag":** A diferencia de otros plugins, este **NO spawnea cajas físicas** en el mapa. Todo ocurre en la memoria, lo que significa **0 impacto en los FPS** del servidor, sin importar cuántos jugadores lo usen a la vez.
-  * 🔒 **Blindado contra Dupeos:** Sistema de persistencia inteligente con **Auto-Guardado** cada 60 segundos. Si tu servidor crashea, los items de tus jugadores están seguros.
-  * 🎒 **Sistema Multi-Vault Escalable (1-18):** Configura hasta **18 baúles diferentes** con tamaños personalizados. Desde una mochila pequeña (5x5) hasta un almacén gigante (12x14).
-  * ⚔️ **Protección PvP "Fair Play":** Evita el *Combat Stashing*. Si un jugador recibe daño de otro usuario, el baúl se bloquea temporalmente. ¡Se acabaron los cobardes que guardan el loot antes de morir\!
-  * 👮 **Herramientas de Administración:** Inspecciona el baúl de cualquier jugador (online u offline) en tiempo real con un solo comando. Ideal para detectar robos o dar soporte.
-  * 🎨 **Totalmente Personalizable:** Configura mensajes, colores, iconos del chat, cooldowns y tamaños a tu gusto.
+---
 
------
+## 🛠️ Arquitectura Técnica
 
-## 📜 Comandos y Permisos
+### 1. Motor de Persistencia LiteDB 💾
+Olvídate de la corrupción de datos. **LSurvival Vault** integra **LiteDB v5**, una base de datos NoSQL embebida de alto rendimiento.
+* **Transacciones ACID:** Tus datos están seguros incluso si se corta la luz del servidor.
+* **Auto-Guardado Silencioso:** El sistema realiza un "commit" de todos los baúles abiertos cada 60 segundos sin spamear la consola.
+* **Organización Limpia:** La base de datos se genera ordenadamente en `/Plugins/LSurvivalVault/Data/`.
 
-### 👤 Para Jugadores
+### 2. Sistema Anti-Combat Logging (PvP Inteligente) ⚔️
+Para mantener la integridad del juego, el plugin incluye un **Combat Manager** nativo.
+* **Filtro Inteligente:** Detecta exclusivamente daño provocado por **otros jugadores**. Si te ataca un zombie, un animal o te caes, el baúl sigue accesible (salvando tu vida).
+* **Bloqueo PvP:** Si recibes daño de un jugador, el comando `/vault` se bloquea temporalmente para evitar el "Stashing" (guardar armas antes de morir).
 
-| Comando | Sintaxis | Descripción | Permiso Requerido |
+### 3. Herramientas de Admin con "Memoria Compartida" 🧠
+El comando `/adminvault` utiliza una técnica de inyección de dependencia avanzada.
+* Si abres el baúl de un jugador que está conectado y mirando su caja, **ambos verán lo mismo en tiempo real**.
+* Si tú mueves un item, desaparece de su pantalla al instante. Sin desincronización, sin copias fantasmas.
+
+---
+
+## 🎮 Comandos y Permisos
+
+El sistema de permisos es **granular y dinámico**. Puedes monetizar o premiar cada nivel de baúl por separado.
+
+### Comandos de Usuario
+
+| Comando | Sintaxis | Descripción | Permiso |
 | :--- | :--- | :--- | :--- |
-| **/vault** | `/vault` | Abre tu Baúl Principal (ID 1). | `lsurvival.vault.1` |
-| **/vault** | `/vault [id]` | Abre un baúl específico (Ej: `/vault 2`, `/vault 5`). | `lsurvival.vault.[id]` |
+| **/vault** | `/vault` | Abre tu baúl principal (Nivel 1). | `lsurvival.vault.1` |
+| **/vault** | `/vault <id>` | Abre un baúl específico (ej: `/vault 5`). | `lsurvival.vault.<id>` |
 
-> **Nota:** El sistema de permisos es dinámico. Si quieres que un VIP tenga acceso al Baúl 5, solo dale el permiso `lsurvival.vault.5`.
+> **Ejemplo:** Para que un VIP pueda abrir hasta el baúl 3, dale los permisos:
+> * `lsurvival.vault.1`
+> * `lsurvival.vault.2`
+> * `lsurvival.vault.3`
 
-### 🛡️ Para Administradores
+### Comandos de Administración
 
-| Comando | Sintaxis | Descripción | Permiso Requerido |
+| Comando | Sintaxis | Descripción | Permiso |
 | :--- | :--- | :--- | :--- |
-| **/adminvault** | `/adminvault [jugador] [id]` | Abre el baúl de otro jugador para inspeccionarlo o modificarlo. Funciona incluso si el jugador está desconectado. | `lsurvival.admin` |
+| **/adminvault** | `/adminvault <jugador> <id>` | Abre el baúl de CUALQUIER jugador (Online/Offline) para inspección, auditoría o recuperación de items. Sincronizado en tiempo real. | `lsurvival.admin` |
 
------
+---
 
-## ⚙️ Configuración Avanzada
+## ⚙️ Configuración Completa
 
-El archivo `LSurvivalVault.configuration.xml` te da control total sobre la experiencia:
+El archivo `LSurvivalVault.configuration.xml` permite un control total sobre la experiencia de juego.
 
-### 📏 Tamaños de Baúles (Progresión)
-
-Puedes definir el tamaño exacto (Ancho x Alto) para cada uno de los 18 baúles.
-
-  * *Ejemplo:* Haz que el **Vault 1** sea pequeño (5x5) para usuarios gratis y el **Vault 2** sea grande (10x10) para VIPs.
-
-<!-- end list -->
+### 📐 Definición de Baúles (Scalability)
+Define cuántos baúles existen y qué tamaño tiene cada uno. El plugin genera 18 por defecto con progresión RPG.
 
 ```xml
 <Vaults>
-  <VaultDefinition><Id>1</Id><Width>5</Width><Height>5</Height></VaultDefinition>
-  <VaultDefinition><Id>2</Id><Width>10</Width><Height>10</Height></VaultDefinition>
-  ...
+  <VaultDefinition>
+    <Id>1</Id>
+    <Width>5</Width>
+    <Height>5</Height>
+  </VaultDefinition>
+  
+  <VaultDefinition>
+    <Id>2</Id>
+    <Width>8</Width>
+    <Height>8</Height>
+  </VaultDefinition>
+
+  <VaultDefinition>
+    <Id>18</Id>
+    <Width>12</Width>
+    <Height>14</Height>
+  </VaultDefinition>
 </Vaults>
-```
-
-### ⚔️ Sistema de Combate
-
-  * **BlockInCombat:** `true` / `false` (Activa el bloqueo en PvP).
-  * **CombatCooldownSeconds:** Tiempo en segundos que el jugador debe esperar tras recibir un golpe (Ej: `30`).
-
-### 💾 Seguridad de Datos
-
-  * **AutoSaveIntervalSeconds:** Frecuencia con la que el servidor guarda los baúles abiertos para prevenir pérdida de datos por crashes (Recomendado: `60`).
-
------
-
-## 📥 Instalación
-
-1.  Apaga tu servidor.
-2.  Copia **`LSurvivalVault.dll`** en la carpeta `.../Rocket/Plugins/`.
-3.  Copia la librería **`LiteDB.dll`** en la carpeta `.../Rocket/Libraries/`.
-4.  Enciende el servidor.
-5.  Configura los permisos en `Permissions.config.xml` y ¡listo\!
-
------
-
-**LSurvival Vault** — *Calidad profesional para servidores que se toman el juego en serio.*

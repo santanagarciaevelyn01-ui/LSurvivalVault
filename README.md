@@ -3,93 +3,105 @@
 ![LSurvival Vault Icon](https://i.imgur.com/tGFsdnA.png)
 
 
+# 📦 LSurvival Vault (RocketMod 4)
 
-## 📖 Introducción
+**Sistema de Almacenamiento Virtual Persistente para Servidores Unturned.**
 
-**LSurvival Vault**  en la gestión de inventarios virtuales. Diseñado desde cero para servidores **Survival Hardcore, PvP y RPG**
-
-A diferencia de mis ideas Anteriores que "esconden" barricadas físicas debajo del mapa (causando lag, desync y glitches de duplicación), **LSurvival Vault** utiliza tecnología de **Inyección de Memoria (Mock Storage)**.
-
-### ¿Por qué elegir LSurvival Vault?
-
-| Característica | Plugins Tradicionales (Legacy) | ⚡ LSurvival Vault (Next-Gen) |
-| :--- | :--- | :--- |
-| **Tecnología** |  | **Virtual Mock Storage (RAM Injection)** |
-| **Impacto FPS** |  **Nulo (0.00ms)** |
-| **Riesgo de Dupeo**  **Imposible (Transacciones Atómicas)** |
-| **Persistencia** | **Base de Datos LiteDB (NoSQL)** |
-| **Escalabilidad** |  **Infinita (1 a 18+ Baúles Config)** |
+LSurvival Vault es un plugin de infraestructura diseñado para gestionar inventarios virtuales adicionales para los jugadores. Utiliza una arquitectura de inyección de memoria y bases de datos NoSQL para proporcionar un almacenamiento seguro, escalable y de alto rendimiento.
 
 ---
 
-## 🛠️ Arquitectura Técnica
+## 📋 Especificaciones Técnicas y Características
 
-### 1. Motor de Persistencia LiteDB 💾
-Olvídate de la corrupción de datos. **LSurvival Vault** integra **LiteDB v5**, una base de datos NoSQL embebida de alto rendimiento.
-* **Transacciones ACID:** Tus datos están seguros incluso si se corta la luz del servidor.
-* **Auto-Guardado Silencioso:** El sistema realiza un "commit" de todos los baúles abiertos cada 60 segundos sin spamear la consola.
-* **Organización Limpia:** La base de datos se genera ordenadamente en `/Plugins/LSurvivalVault/Data/`.
+### 🛠️ Arquitectura de Almacenamiento (Mock Storage)
+El sistema genera contenedores de almacenamiento virtuales directamente en la memoria RAM del servidor mediante inyección de dependencias.
+* **Funcionamiento en Memoria:** No instancia objetos físicos (barricadas) en el mundo del juego, eliminando colisiones y renderizado innecesario.
+* **Sincronización:** El contenedor virtual se posiciona dinámicamente sobre el jugador para cumplir con las validaciones de distancia del servidor.
 
-### 2. Sistema Anti-Combat Logging (PvP Inteligente) ⚔️
-Para mantener la integridad del juego, el plugin incluye un **Combat Manager** nativo.
-* **Filtro Inteligente:** Detecta exclusivamente daño provocado por **otros jugadores**. Si te ataca un zombie, un animal o te caes, el baúl sigue accesible (salvando tu vida).
-* **Bloqueo PvP:** Si recibes daño de un jugador, el comando `/vault` se bloquea temporalmente para evitar el "Stashing" (guardar armas antes de morir).
+### 💾 Persistencia de Datos (LiteDB)
+El plugin sustituye el almacenamiento de archivos planos por **LiteDB v5**, una base de datos embebida transaccional.
+* **Integridad de Datos:** Utiliza transacciones atómicas para operaciones de lectura/escritura.
+* **Auto-Guardado (Auto-Save):** Ejecuta un ciclo de guardado automático cada 60 segundos (configurable) para volcar los datos de la memoria RAM al disco, minimizando la pérdida de datos ante interrupciones del servidor.
+* **Estructura Unificada:** Todos los datos se centralizan en un único archivo de base de datos (`LSurvivalVault.db`) ubicado en la carpeta `Data` del plugin.
 
-### 3. Herramientas de Admin con "Memoria Compartida" 🧠
-El comando `/adminvault` utiliza una técnica de inyección de dependencia avanzada.
-* Si abres el baúl de un jugador que está conectado y mirando su caja, **ambos verán lo mismo en tiempo real**.
-* Si tú mueves un item, desaparece de su pantalla al instante. Sin desincronización, sin copias fantasmas.
+### ⚔️ Gestión de Combate (PvP Manager)
+Integra un monitor de eventos de daño para regular el acceso al almacenamiento durante situaciones de combate.
+* **Detección de Fuente:** Identifica específicamente el daño proveniente de otros jugadores (PvP), ignorando daños ambientales o de zombies.
+* **Bloqueo Temporal:** Impide la ejecución del comando de apertura durante un periodo de tiempo configurable tras recibir daño.
+
+### 👮 Administración en Tiempo Real
+Herramientas para la gestión y auditoría de inventarios por parte del personal administrativo.
+* **Inspección Remota:** Permite abrir el inventario de cualquier jugador, independientemente de si está conectado o desconectado.
+* **Memoria Compartida:** Si un administrador abre el baúl de un jugador que está usándolo activamente, ambos clientes comparten la misma instancia de memoria, permitiendo ver modificaciones en tiempo real.
+
+### 📈 Escalabilidad (Sistema Multi-Vault)
+El sistema soporta la configuración de múltiples instancias de almacenamiento por jugador.
+* **Capacidad Dinámica:** Permite definir hasta **18 baúles independientes**.
+* **Dimensiones Personalizables:** Cada ID de baúl puede tener un tamaño de cuadrícula único (Ancho x Alto), configurado desde el archivo XML.
 
 ---
 
-## 🎮 Comandos y Permisos
+## 📜 Comandos y Permisos
 
-El sistema de permisos es **granular y dinámico**. Puedes monetizar o premiar cada nivel de baúl por separado.
+### Usuario
 
-### Comandos de Usuario
-
-| Comando | Sintaxis | Descripción | Permiso |
+| Comando | Sintaxis | Descripción | Permiso Requerido |
 | :--- | :--- | :--- | :--- |
-| **/vault** | `/vault` | Abre tu baúl principal (Nivel 1). | `lsurvival.vault.1` |
-| **/vault** | `/vault <id>` | Abre un baúl específico (ej: `/vault 5`). | `lsurvival.vault.<id>` |
+| **/vault** | `/vault` | Accede al baúl predeterminado (ID 1). | `lsurvival.vault.1` |
+| **/vault** | `/vault [id]` | Accede a un baúl específico por su número. | `lsurvival.vault.[id]` |
 
-> **Ejemplo:** Para que un VIP pueda abrir hasta el baúl 3, dale los permisos:
-> * `lsurvival.vault.1`
-> * `lsurvival.vault.2`
-> * `lsurvival.vault.3`
+> **Nota:** Los permisos siguen el formato `lsurvival.vault.<numero>`. Ejemplo: `lsurvival.vault.5`.
 
-### Comandos de Administración
+### Administración
 
-| Comando | Sintaxis | Descripción | Permiso |
+| Comando | Sintaxis | Descripción | Permiso Requerido |
 | :--- | :--- | :--- | :--- |
-| **/adminvault** | `/adminvault <jugador> <id>` | Abre el baúl de CUALQUIER jugador (Online/Offline) para inspección, auditoría o recuperación de items. Sincronizado en tiempo real. | `lsurvival.admin` |
+| **/adminvault** | `/adminvault [jugador] [id]` | Abre el baúl especificado del jugador objetivo para gestión. | `lsurvival.admin` |
 
 ---
 
-## ⚙️ Configuración Completa
+## ⚙️ Configuración (XML)
 
-El archivo `LSurvivalVault.configuration.xml` permite un control total sobre la experiencia de juego.
+El archivo `LSurvivalVault.configuration.xml` controla los parámetros operativos del plugin.
 
-### 📐 Definición de Baúles (Scalability)
-Define cuántos baúles existen y qué tamaño tiene cada uno. El plugin genera 18 por defecto con progresión RPG.
+### Definición de Baúles
+Lista que define las propiedades físicas de cada contenedor disponible.
 
 ```xml
 <Vaults>
   <VaultDefinition>
     <Id>1</Id>
-    <Width>5</Width>
-    <Height>5</Height>
-  </VaultDefinition>
+    <Width>5</Width>   <Height>5</Height>  </VaultDefinition>
   
   <VaultDefinition>
     <Id>2</Id>
     <Width>8</Width>
     <Height>8</Height>
   </VaultDefinition>
+  
+  </Vaults>
+````
 
-  <VaultDefinition>
-    <Id>18</Id>
-    <Width>12</Width>
-    <Height>14</Height>
-  </VaultDefinition>
-</Vaults>
+### Parámetros del Sistema
+
+````xml
+<BlockInCombat>true</BlockInCombat>             <CombatCooldownSeconds>30</CombatCooldownSeconds> <AutoSaveIntervalSeconds>60</AutoSaveIntervalSeconds> <StorageAssetId>1283</StorageAssetId> ```
+
+---
+
+## 📥 Guía de Despliegue
+
+Para la correcta instalación en un entorno de producción RocketMod 4:
+
+1.  **Dependencias:**
+    * El plugin requiere la librería **`LiteDB.dll`** (Versión 5.0.x para .NET 4.6.1).
+    * Ubicación requerida: Carpeta `/Libraries` de la instancia de Rocket.
+
+2.  **Instalación del Plugin:**
+    * Archivo `LSurvivalVault.dll` en la carpeta `/Plugins`.
+
+3.  **Inicialización:**
+    * Al iniciar, el plugin generará automáticamente la estructura de carpetas:
+        * Configuración: `/Plugins/LSurvivalVault/`
+        * Base de Datos: `/Plugins/LSurvivalVault/Data/LSurvivalVault.db`
+````

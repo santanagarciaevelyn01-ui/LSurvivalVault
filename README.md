@@ -8,7 +8,7 @@
 
 **LSurvival Vault** no es otro plugin de `/vault` más. Es una reingeniería total del concepto de almacenamiento personal, diseñado específicamente para servidores **Survival, PvP y Hardcore** que no pueden permitirse fallos, lag ni dupeos.
 
-Olvídate de las barricadas físicas bajo el mapa y los glitches de duplicación. Este sistema es **100% Virtual, Seguro y Escalable**.
+ Este sistema es **100% Virtual, Seguro y Escalable**.
 
 -----
 

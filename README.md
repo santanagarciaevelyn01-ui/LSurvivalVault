@@ -95,8 +95,7 @@ Supported modes in `LSurvivalVault.configuration.xml`:
 
 ---
 💖 Acknowledgments
-Special recognition to Midnight for the high-level technical audit. Your insights regarding the Unity Lifecycle optimization (specifically the removal of the FixedUpdate loop) and the recommendation for Async I/O patterns were instrumental in refactoring this plugin from a standard script into a professional, optimized system.
-
+Thanks to Midnight for pointing out the performance issue regarding the FixedUpdate loop. That specific insight led me to re-evaluate the code and implement the correct event-driven solution included in this version.
 ## ⚙️ Configuration
 
 Recommended settings for production environments:

@@ -1,129 +1,160 @@
-# 📦 LSurvival Vault (RocketMod 4)
 
-![LSurvival Vault Icon](https://i.imgur.com/tGFsdnA.png)
 
-# 📦 LSurvival Vault (RocketMod 4)
+-----
 
-**Persistent Virtual Storage System for Unturned Servers.**
+````markdown
+<div align="center">
 
-LSurvival Vault is an infrastructure plugin designed to manage additional virtual inventories for players. It uses a memory injection architecture and NoSQL databases to provide secure, scalable, and high-performance storage.
+<img src="https://i.imgur.com/tGFsdnA.png" alt="LSurvival Vault Logo" width="150"/>
 
----
+# 📦 LSurvival Vault
+### Advanced Virtual Storage for RocketMod 4
 
-## 📋 Technical Specifications and Features
+![RocketMod](https://img.shields.io/badge/RocketMod-4-blue?style=flat-square&logo=csharp)
+![Unturned](https://img.shields.io/badge/Game-Unturned-green?style=flat-square&logo=steam)
+![Database](https://img.shields.io/badge/Database-LiteDB_v5-orange?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Stable-success?style=flat-square)
 
-### 🛠️ Storage Architecture (Mock Storage)
-The system generates virtual storage containers directly in the server's RAM using dependency injection.
-
-* **In-Memory Operation:** It does not instantiate physical objects (barricades) in the game world, eliminating collisions and unnecessary rendering.
-
-* **Synchronization:** The virtual container dynamically positions itself over the player to comply with the server's distance validations.
-
-### 💾 Data Persistence (LiteDB)
-The plugin replaces flat file storage with **LiteDB v5**, a transactional embedded database.
-
-* **Data Integrity:** Uses atomic transactions for read/write operations.
-
-* **Auto-Save:** Executes an automatic save cycle every 60 seconds (configurable) to dump data from RAM to disk, minimizing data loss in the event of server interruptions.
-
-* **Unified Structure:** All data is centralized in a single database file (`LSurvivalVault.db`) located in the plugin's `Data` folder.
-
-### ⚔️ Combat Management (PvP Manager)
-Integrates a damage event monitor to regulate storage access during combat situations.
-
-* **Source Detection:** Specifically identifies damage from other players (PvP), ignoring environmental or zombie damage.
-
-* **Temporary Lock:** Prevents the opening command from being executed for a configurable period of time after taking damage.
-
-### 👮 Real-Time Administration
-Tools for inventory management and auditing by administrative staff.
-
-* **Remote Inspection:** Allows opening any player's inventory, regardless of whether they are online or offline.
-
-* **Shared Memory:** If an administrator opens the vault of a player who is actively using it, both clients share the same memory instance, allowing real-time modifications to be viewed.
-
-### 📈 Scalability (Multi-Vault System)
-The system supports configuring multiple storage instances per player.
-
-* **Dynamic Capacity:** Allows defining up to **18 independent vaults**.
-
-* **Customizable Dimensions:** Each vault ID can have a unique grid size (Width x Height), configured from the XML file.
+<p align="center">
+  <b>LSurvival Vault</b> is a high-performance infrastructure plugin designed to manage persistent virtual inventories. 
+  <br>
+  It utilizes <b>memory injection</b> and <b>NoSQL databases</b> to provide secure, scalable, and lag-free storage solutions.
+</p>
 
 ---
 
-## 📜 Commands and Permissions
+</div>
 
-### User
+## 📑 Table of Contents
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Technical Specifications](#-technical-specifications)
+- [Commands & Permissions](#-commands--permissions)
+- [Configuration](#-configuration)
+- [Installation](#-installation)
 
-| Command | Syntax | Description | Required Permission |
+---
 
+## 🔭 Overview
+
+**LSurvival Vault** replaces traditional physical storage (barricades) with a virtualized system. By not instantiating physical objects in the game world, it eliminates collision calculations and unnecessary rendering, significantly improving server performance while offering a modern user experience.
+
+> **Core Philosophy:** Seamless integration, atomic data integrity, and combat-aware mechanics.
+
+---
+
+## ✨ Key Features
+
+| Feature | Description |
+| :--- | :--- |
+| **🧠 In-Memory Operation** | Generates virtual containers in RAM via dependency injection. No physical barricades, no lag. |
+| **🛡️ Combat Manager** | Monitors damage events. If a player takes PvP damage, access to the vault is locked for a configurable duration. |
+| **💾 LiteDB Persistence** | Uses **LiteDB v5** (NoSQL). Replaces fragile flat files with transactional, atomic database operations. |
+| **🔄 Auto-Save** | Asynchronous background saving every 60 seconds (configurable) to minimize data loss during crashes. |
+| **👮 Admin Tools** | Real-time inspection. Admins can open offline players' vaults or "spy" on active vaults with shared memory updates. |
+| **📈 Scalability** | Supports up to **18 independent vaults** per player, each with custom dimensions (Width x Height). |
+
+---
+
+## 📋 Technical Specifications
+
+### Storage Architecture (Mock Storage)
+* **Dynamic Positioning:** The virtual container dynamically positions itself relative to the player to satisfy server-side distance checks without physical instantiation.
+* **Zero Collision:** Completely removes the physics overhead associated with standard metal lockers or crates.
+
+### Data Integrity
+* **Atomic Transactions:** Read/Write operations are transaction-safe.
+* **Unified Storage:** All data is centralized in a single, portable file:  
+    `.../Plugins/LSurvivalVault/Data/LSurvivalVault.db`
+
+---
+
+## ⌨️ Commands & Permissions
+
+### 👤 User Commands
+
+| Command | Syntax | Description | Permission Node |
 | :--- | :--- | :--- | :--- |
+| **Open Default** | `/vault` | Opens the default vault (ID 1). | `lsurvival.vault.1` |
+| **Open Specific** | `/vault <id>` | Opens a specific vault number. | `lsurvival.vault.<id>` |
 
-**/vault** | `/vault` | Accesses the default vault (ID 1). | `lsurvival.vault.1` |
+> **Note:** Permissions follow the specific ID format. Example: To grant access to vault #5, use `lsurvival.vault.5`.
 
-**/vault** | `/vault [id]` | Accesses a specific vault by its number. | `lsurvival.vault.[id]` |
+### 🛡️ Admin Commands
 
-> **Note:** Permissions follow the format `lsurvival.vault.<number>`. Example: `lsurvival.vault.5`.
-
-### Administration
-
-| Command | Syntax | Description | Required Permission |
-
+| Command | Syntax | Description | Permission Node |
 | :--- | :--- | :--- | :--- |
-
-**/adminvault** | `/adminvault [player] [id]` | Opens the specified vault of the target player for management. | `lsurvival.admin` |
+| **Inspect** | `/adminvault <player> <id>` | Force open any player's vault (Online/Offline). | `lsurvival.admin` |
 
 ---
 
-## ⚙️ Configuration (XML)
+## ⚙️ Configuration
 
-The `LSurvivalVault.configuration.xml` file controls the plugin's operational parameters.
+The `LSurvivalVault.configuration.xml` controls physics, cooldowns, and capacity.
 
-### Vault Definitions
-List that defines the physical properties of each available vault.
+### 1. Vault Definitions
+Define the size of each vault tier here.
 
 ```xml
-<Vaults> 
-<VaultDefinition> 
-<Id>1</Id> 
-<Width>5</Width> <Height>5</Height> </VaultDefinition> 
+<Vaults>
+    <VaultDefinition>
+        <Id>1</Id>
+        <Width>5</Width>
+        <Height>5</Height>
+    </VaultDefinition>
 
-<VaultDefinition> 
-<Id>2</Id> 
-<Width>8</Width> 
-<Height>8</Height> 
-</VaultDefinition> 
-
+    <VaultDefinition>
+        <Id>2</Id>
+        <Width>8</Width>
+        <Height>8</Height>
+    </VaultDefinition>
 </Vaults>
 ````
 
-### System Parameters
+### 2\. System Parameters
 
-````xml
-<BlockInCombat>true</BlockInCombat> <CombatCooldownSeconds>30</CombatCooldownSeconds> <AutoSaveIntervalSeconds>60</AutoSaveIntervalSeconds> <StorageAssetId>1283</StorageAssetId> ```
+Global settings for combat and saving.
 
----
+```xml
+<Configuration>
+    <BlockInCombat>true</BlockInCombat>
+    <CombatCooldownSeconds>30</CombatCooldownSeconds>
+    
+    <AutoSaveIntervalSeconds>60</AutoSaveIntervalSeconds>
+    
+    <StorageAssetId>1283</StorageAssetId>
+</Configuration>
+```
 
-## 📥 Guide Deployment
+-----
 
-For proper installation in a RocketMod 4 production environment:
+## 📥 Installation
 
-1. **Dependencies:**
+Follow these steps for a clean deployment on RocketMod 4.
 
-* The plugin requires the **`LiteDB.dll`** library (Version 5.0.x for .NET 4.6.1).
+1.  **Download Dependencies:**
 
-* Required location: `/Libraries` folder of the Rocket instance.
+      * Download **`LiteDB.dll`** (Version 5.0.x for .NET 4.6.1 framework).
+      * Place it in the Rocket **Libraries** folder:  
+        `Server/Rocket/Libraries/LiteDB.dll`
 
-2. **Plugin Installation:**
+2.  **Install Plugin:**
 
-* The `LSurvivalVault.dll` file in the `/Plugins` folder.
+      * Place `LSurvivalVault.dll` in the Plugins folder:  
+        `Server/Rocket/Plugins/LSurvivalVault.dll`
 
-3. **Initialization:**
+3.  **First Run:**
 
-* Upon startup, the plugin will automatically generate the following folder structure:
+      * Start the server. The plugin will generate the configuration folder and database automatically:
+          * 📂 `.../Plugins/LSurvivalVault/`
+          * 📄 `.../Plugins/LSurvivalVault/Data/LSurvivalVault.db`
 
-* Configuration: `/Plugins/LSurvivalVault/`
+-----
 
-* Database: `/Plugins/LSurvivalVault/Data/LSurvivalVault.db`
-````
-````
+\<div align="center"\>
+
+**Created for the Unturned Community** *Need help? Open an issue in the repository.*
+
+\</div\>
+
+

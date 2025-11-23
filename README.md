@@ -40,16 +40,6 @@ It injects a virtual asset identity (Asset ID 1283) into the network stream to t
 
 > **Result:** 100% Native UI experience with **0% Physics Impact**.
 
----
-
-## 🚀 Technical Refactoring & Optimization
-
-Following a strict code audit, the engine has been rewritten to address common Unity lifecycle pitfalls and concurrency issues often found in legacy plugins.
-
-### 🔧 Fixed Architectural Bottlenecks
-* **Elimination of `FixedUpdate` Polling:** Previous iterations relied on the physics loop (50Hz) for timer checks, creating unnecessary CPU overhead. This has been refactored to use native **Coroutines/Invokes**, freeing up valuable ticks for the game engine.
-* **Main Thread Unblocking:** I/O operations (saving to disk) previously caused micro-stutters. The new **Snapshot Pattern** captures memory state in microseconds on the main thread and offloads the heavy write operations to a background `Task`, ensuring smooth gameplay even during auto-saves.
-* **Asset Identity Crash Fix:** Resolved `NullReferenceException` issues related to virtual storages lacking asset definitions by implementing a robust **Mock Barricade Injection** pipeline.
 
 ---
 

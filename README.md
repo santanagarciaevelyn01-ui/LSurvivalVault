@@ -1,8 +1,4 @@
 
-
------
-
-````markdown
 <div align="center">
 
 <img src="https://i.imgur.com/tGFsdnA.png" alt="LSurvival Vault Logo" width="150"/>
@@ -109,52 +105,3 @@ Define the size of each vault tier here.
         <Height>8</Height>
     </VaultDefinition>
 </Vaults>
-````
-
-### 2\. System Parameters
-
-Global settings for combat and saving.
-
-```xml
-<Configuration>
-    <BlockInCombat>true</BlockInCombat>
-    <CombatCooldownSeconds>30</CombatCooldownSeconds>
-    
-    <AutoSaveIntervalSeconds>60</AutoSaveIntervalSeconds>
-    
-    <StorageAssetId>1283</StorageAssetId>
-</Configuration>
-```
-
------
-
-## 📥 Installation
-
-Follow these steps for a clean deployment on RocketMod 4.
-
-1.  **Download Dependencies:**
-
-      * Download **`LiteDB.dll`** (Version 5.0.x for .NET 4.6.1 framework).
-      * Place it in the Rocket **Libraries** folder:  
-        `Server/Rocket/Libraries/LiteDB.dll`
-
-2.  **Install Plugin:**
-
-      * Place `LSurvivalVault.dll` in the Plugins folder:  
-        `Server/Rocket/Plugins/LSurvivalVault.dll`
-
-3.  **First Run:**
-
-      * Start the server. The plugin will generate the configuration folder and database automatically:
-          * 📂 `.../Plugins/LSurvivalVault/`
-          * 📄 `.../Plugins/LSurvivalVault/Data/LSurvivalVault.db`
-
------
-
-\<div align="center"\>
-
-**Created for the Unturned Community** *Need help? Open an issue in the repository.*
-
-\</div\>
-
-
